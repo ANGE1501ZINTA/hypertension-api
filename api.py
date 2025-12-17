@@ -6,7 +6,7 @@ import numpy as np
 
 app = FastAPI(title="Hypertension Risk API")
 
-# CORS (obligatoire pour le frontend JS)
+# CORS (autoriser frontend GitHub Pages)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -15,7 +15,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Charger modèle et scaler
+# ===== TEST API =====
+@app.get("/")
+def root():
+    return {"status": "API running"}
+
+# ===== LOAD MODEL =====
 model = joblib.load("model.pkl")
 scaler = joblib.load("scaler.pkl")
 
@@ -27,6 +32,7 @@ feature_order = [
 
 scaler_features = ['age', 'height', 'weight', 'ap_hi', 'ap_lo', 'BMI']
 
+# ===== INPUT SCHEMA =====
 class Patient(BaseModel):
     age: float
     gender: int
@@ -40,6 +46,7 @@ class Patient(BaseModel):
     alco: int
     active: int
 
+# ===== PREDICTION =====
 @app.post("/predict")
 def predict(patient: Patient):
 
